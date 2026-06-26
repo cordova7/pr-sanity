@@ -1,48 +1,39 @@
-import type { Analyzer } from './types.js';
-import type { GitContext } from '../models/git-context.js';
-import type { AnalysisResult } from '../models/analysis-result.js';
-import { noopAnalyzer } from './noop.analyzer.js';
-
-const registry = new Map<string, Analyzer>();
-
-function register(analyzer: Analyzer): void {
-  registry.set(analyzer.id, analyzer);
-}
-
-register(noopAnalyzer);
-
-export function listAnalyzers(): Analyzer[] {
-  return Array.from(registry.values());
-}
-
-export function getAnalyzer(id: string): Analyzer | undefined {
-  return registry.get(id);
-}
-
-export async function runAnalyzers(
-  context: GitContext,
-  analyzerIds?: string[],
-): Promise<AnalysisResult[]> {
-  const selected =
-    analyzerIds && analyzerIds.length > 0
-      ? analyzerIds.map((id) => {
-          const analyzer = getAnalyzer(id);
-          if (!analyzer) {
-            throw new Error(`Unknown analyzer: ${id}`);
-          }
-          return analyzer;
-        })
-      : listAnalyzers();
-
-  const results: AnalysisResult[] = [];
-
-  for (const analyzer of selected) {
-    const result = await analyzer.run(context);
-    results.push(result);
-  }
-
-  return results;
-}
-
 export type { Analyzer } from './types.js';
-export { noopAnalyzer } from './noop.analyzer.js';
+export { AnalyzerManager, analyzerManager } from './analyzer-manager.js';
+export {
+  missingTestsAnalyzer,
+  isBusinessLogicPath,
+  isTestProjectPath,
+} from './missing-tests.analyzer.js';
+export {
+  missingMigrationAnalyzer,
+  isEntityPath,
+  isMigrationPath,
+} from './missing-migration.analyzer.js';
+export {
+  missingAuthorizeAnalyzer,
+  isControllerFile,
+  hasControllerLevelAuthorize,
+  findUnprotectedNewEndpoints,
+  type UnprotectedEndpoint,
+} from './missing-authorize.analyzer.js';
+export {
+  publicApiAnalyzer,
+  isCSharpFile,
+  parsePublicApiDeclaration,
+  findPublicApiChanges,
+  type PublicApiKind,
+  type PublicApiChangeType,
+  type PublicApiChange,
+} from './public-api.analyzer.js';
+
+import { analyzerManager } from './analyzer-manager.js';
+import { missingAuthorizeAnalyzer } from './missing-authorize.analyzer.js';
+import { missingMigrationAnalyzer } from './missing-migration.analyzer.js';
+import { missingTestsAnalyzer } from './missing-tests.analyzer.js';
+import { publicApiAnalyzer } from './public-api.analyzer.js';
+
+analyzerManager.register(missingTestsAnalyzer);
+analyzerManager.register(missingMigrationAnalyzer);
+analyzerManager.register(missingAuthorizeAnalyzer);
+analyzerManager.register(publicApiAnalyzer);

@@ -1,8 +1,6 @@
 import type { GitContext } from '../models/git-context.js';
-import type { AnalysisResult } from '../models/analysis-result.js';
+import type { Finding } from '../models/finding.js';
 
 export interface Analyzer {
-  readonly id: string;
-  readonly description: string;
-  run(context: GitContext): Promise<AnalysisResult>;
+  run(context: GitContext): Promise<Finding[]>;
 }

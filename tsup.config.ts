@@ -8,4 +8,10 @@ export default defineConfig({
   clean: true,
   sourcemap: true,
   splitting: false,
+  loader: {
+    '.json': 'json',
+  },
+  banner: {
+    js: '#!/usr/bin/env node',
+  },
 });

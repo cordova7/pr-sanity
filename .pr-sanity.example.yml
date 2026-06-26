@@ -1,0 +1,9 @@
+health:
+  ignore:
+    modules:
+      - Legacy
+      - Migrations
+  thresholds:
+    persistenceBypassRate: 0.20   # we know Billing is bad, allow 20%
+  blessed:
+    resultPattern: Ardalis.Result  # this is our standard

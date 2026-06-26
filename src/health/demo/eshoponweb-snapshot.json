@@ -1,0 +1,52 @@
+{
+  "repoName": "eShopOnWeb",
+  "timestamp": "2025-03-12 09:41:18",
+  "findings": [
+    {
+      "module": "ApplicationCore, Web",
+      "tensionType": "result-pattern-inconsistency",
+      "severity": "critical",
+      "title": "Result pattern inconsistency",
+      "detail": "Ardalis.Result: 18 (62% dominant), OneOf: 7 (24%), raw bool: 4 (14%)",
+      "affectedFiles": [
+        "src/ApplicationCore/Services/BasketService.cs",
+        "src/Web/Controllers/OrderController.cs",
+        "src/Web/Pages/Basket/Checkout.cshtml.cs"
+      ]
+    },
+    {
+      "module": "Controllers, Pages",
+      "tensionType": "validation-strategy-inconsistency",
+      "severity": "warning",
+      "title": "Validation strategy inconsistency",
+      "detail": "DataAnnotations: 15 (88% dominant), manual: 2 (12%)",
+      "affectedFiles": [
+        "src/Web/Controllers/ManageController.cs",
+        "src/Web/Pages/Basket/Index.cshtml.cs"
+      ]
+    },
+    {
+      "module": "ApplicationCore",
+      "tensionType": "persistence-bypass",
+      "severity": "critical",
+      "title": "Repository pattern bypass in Application layer",
+      "detail": "9 of 24 Application-layer files (38%) access DbContext directly",
+      "affectedFiles": [
+        "src/ApplicationCore/Services/BasketService.cs",
+        "src/ApplicationCore/Services/OrderService.cs",
+        "src/Infrastructure/Data/CatalogContext.cs"
+      ]
+    },
+    {
+      "module": "Web",
+      "tensionType": "cqrs-bypass",
+      "severity": "critical",
+      "title": "MediatR bypass in Application layer",
+      "detail": "4 bypass files vs 18 handlers (18% bypass rate)",
+      "affectedFiles": [
+        "src/Web/Services/BasketViewModelService.cs",
+        "src/Web/Controllers/OrderController.cs"
+      ]
+    }
+  ]
+}

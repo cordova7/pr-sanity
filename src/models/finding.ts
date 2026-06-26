@@ -1,9 +1,8 @@
-export type Severity = 'error' | 'warning' | 'info';
+export type Severity = 'info' | 'warning' | 'error';
 
 export interface Finding {
-  id: string;
   severity: Severity;
-  message: string;
+  title: string;
+  explanation: string;
   file?: string;
-  line?: number;
 }

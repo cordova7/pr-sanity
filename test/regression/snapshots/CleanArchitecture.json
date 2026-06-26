@@ -1,0 +1,55 @@
+{
+  "score": 90,
+  "criticalCount": 0,
+  "warningCount": 2,
+  "tensionCount": 2,
+  "hasCritical": false,
+  "findings": [
+    {
+      "module": "Application",
+      "tensionType": "validation-strategy-inconsistency",
+      "severity": "warning",
+      "title": "Validation strategy inconsistency",
+      "detail": "FluentValidation: 6 (86%, dominant), manual: 1 (14%)",
+      "affectedFiles": [
+        "src/Application/Common/Behaviours/ValidationBehaviour.cs"
+      ]
+    },
+    {
+      "module": "Application",
+      "tensionType": "persistence-bypass",
+      "severity": "warning",
+      "title": "Repository pattern bypass in Application layer",
+      "detail": "11 of 37 Application-layer files (30%) access DbContext directly",
+      "affectedFiles": [
+        "src/Application/Common/Interfaces/IApplicationDbContext.cs",
+        "src/Application/TodoItems/Commands/CreateTodoItem/CreateTodoItem.cs",
+        "src/Application/TodoItems/Commands/DeleteTodoItem/DeleteTodoItem.cs",
+        "src/Application/TodoItems/Commands/UpdateTodoItem/UpdateTodoItem.cs",
+        "src/Application/TodoItems/Commands/UpdateTodoItemDetail/UpdateTodoItemDetail.cs",
+        "src/Application/TodoLists/Commands/CreateTodoList/CreateTodoList.cs",
+        "src/Application/TodoLists/Commands/CreateTodoList/CreateTodoListCommandValidator.cs",
+        "src/Application/TodoLists/Commands/DeleteTodoList/DeleteTodoList.cs"
+      ]
+    }
+  ],
+  "moduleSummaries": [
+    {
+      "module": "Application",
+      "tensionCount": 2,
+      "criticalCount": 0,
+      "tensions": [
+        {
+          "type": "validation-strategy-inconsistency",
+          "severity": "warning",
+          "title": "Validation strategy inconsistency"
+        },
+        {
+          "type": "persistence-bypass",
+          "severity": "warning",
+          "title": "Repository pattern bypass in Application layer"
+        }
+      ]
+    }
+  ]
+}

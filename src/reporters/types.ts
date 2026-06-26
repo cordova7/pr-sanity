@@ -1,5 +1,5 @@
-import type { AnalysisResult } from '../models/analysis-result.js';
+import type { Finding } from '../models/finding.js';
 
 export interface Reporter {
-  report(results: AnalysisResult[]): void;
+  report(findings: Finding[]): void;
 }

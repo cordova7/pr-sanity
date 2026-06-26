@@ -14,5 +14,6 @@ export function getReporter(format: ReportFormat): Reporter {
 }
 
 export type { Reporter } from './types.js';
-export { consoleReporter } from './console.reporter.js';
-export { jsonReporter } from './json.reporter.js';
+export { consoleReporter, reportFindings, formatFinding } from './console.reporter.js';
+export { terminalReporter } from './terminal.reporter.js';
+export { jsonReporter, buildReport, type PrSanityReport } from './json.reporter.js';

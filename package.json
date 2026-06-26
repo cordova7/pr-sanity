@@ -1,19 +1,21 @@
 {
   "name": "pr-sanity",
-  "version": "0.1.0",
-  "description": "Sanity checks for pull requests",
+  "version": "0.1.1",
+  "description": "Architecture drift detection for .NET codebases",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "bin": {
-    "pr-sanity": "./bin/pr-sanity.js"
+    "pr-sanity": "./dist/index.js"
   },
   "files": [
-    "bin",
-    "dist"
+    "dist/",
+    "action.yml",
+    "README.md",
+    ".pr-sanity.example.yml"
   ],
   "engines": {
-    "node": ">=20"
+    "node": ">=18"
   },
   "scripts": {
     "build": "tsup",
@@ -21,21 +23,43 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "npm run build",
+    "test": "npm run build && node test/run-fixtures.js",
+    "test:fixtures": "npm run build && node test/run-fixtures.js",
+    "test:verbose": "npm run build && node test/run-fixtures.js --verbose",
+    "test:regression": "npm run build && node test/regression/regression.js",
+    "test:action": "npm run build && node test/action/run-action-test.js",
+    "demo": "node dist/index.js health --demo",
+    "demo:drift": "bash test/demo-drift.sh"
   },
   "keywords": [
+    "dotnet",
+    "csharp",
+    "architecture",
     "cli",
-    "pull-request",
-    "pr",
-    "git",
-    "sanity"
+    "static-analysis"
   ],
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cordova7/pr-sanity.git"
+  },
+  "homepage": "https://github.com/cordova7/pr-sanity#readme",
+  "bugs": {
+    "url": "https://github.com/cordova7/pr-sanity/issues"
+  },
   "dependencies": {
-    "commander": "^13.1.0"
+    "chalk": "^5.6.2",
+    "commander": "^13.1.0",
+    "js-yaml": "^5.1.0",
+    "ora": "^9.4.1",
+    "picocolors": "^1.1.1",
+    "simple-git": "^3.27.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.28.0",
+    "@types/js-yaml": "^4.0.9",
     "@types/node": "^22.15.30",
     "eslint": "^9.28.0",
     "eslint-config-prettier": "^10.1.5",

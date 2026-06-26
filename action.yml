@@ -1,0 +1,152 @@
+name: PR Sanity
+description: Run pr-sanity pull request checks and enforce a risk score threshold
+branding:
+  icon: check-circle
+  color: blue
+
+inputs:
+  base:
+    description: Git base ref to compare against (e.g. origin/main)
+    required: false
+    default: ''
+  head:
+    description: Git head ref to analyze
+    required: false
+    default: HEAD
+  max-risk:
+    description: Fail when risk score exceeds this value
+    required: false
+    default: '66'
+  report-path:
+    description: Path to write the JSON report
+    required: false
+    default: pr-sanity-report.json
+  format:
+    description: Stdout output format (console or json)
+    required: false
+    default: console
+  node-version:
+    description: Node.js version for setup-node
+    required: false
+    default: '20'
+  run-health:
+    description: Run architecture health scan after PR check
+    required: false
+    default: 'false'
+
+outputs:
+  report-path:
+    description: Path to the JSON report file
+    value: ${{ steps.set-outputs.outputs.report-path }}
+  risk-score:
+    description: Computed risk score from the report
+    value: ${{ steps.set-outputs.outputs.risk-score }}
+  risk-level:
+    description: Risk level (Low, Medium, or High) from the report
+    value: ${{ steps.set-outputs.outputs.risk-level }}
+  health-score:
+    description: Health score from the health scan (0-100)
+    value: ${{ steps.set-outputs.outputs.health-score }}
+
+runs:
+  using: composite
+  steps:
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ inputs.node-version }}
+
+    - name: Install and build pr-sanity
+      shell: bash
+      working-directory: ${{ github.action_path }}
+      run: |
+        npm ci
+        npm run build
+
+    - name: Run pr-sanity
+      shell: bash
+      run: |
+        BASE="${{ inputs.base }}"
+        if [ -z "$BASE" ]; then
+          BASE="origin/${{ github.event.pull_request.base.ref }}"
+        fi
+
+        node "${{ github.action_path }}/bin/pr-sanity.js" check \
+          --base "$BASE" \
+          --head "${{ inputs.head }}" \
+          --format "${{ inputs.format }}" \
+          --output "${{ inputs.report-path }}" \
+          --max-risk "${{ inputs.max-risk }}"
+
+    - name: Run pr-sanity health
+      if: inputs.run-health == 'true'
+      id: run-health
+      shell: bash
+      run: |
+        node "${{ github.action_path }}/bin/pr-sanity.js" health \
+          --path "${{ github.workspace }}" \
+          --ci \
+          --comment \
+          --save-baseline \
+          --format html > health-summary.json
+
+    - name: Upload health report
+      if: inputs.run-health == 'true'
+      uses: actions/upload-artifact@v4
+      with:
+        name: pr-sanity-health-report
+        path: .pr-sanity/health-report.html
+        if-no-files-found: warn
+
+    # Consuming workflows must grant pull-requests: write when run-health is enabled.
+    - name: Post health comment
+      if: inputs.run-health == 'true' && github.event_name == 'pull_request'
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const fs = require('fs');
+          const comment = fs.readFileSync('.pr-sanity/health-comment.md', 'utf8');
+
+          const { data: comments } = await github.rest.issues.listComments({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            issue_number: context.issue.number,
+          });
+
+          const existing = comments.find(c =>
+            c.body.includes('Architecture Health') &&
+            c.user.login === 'github-actions[bot]'
+          );
+
+          if (existing) {
+            await github.rest.issues.updateComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: existing.id,
+              body: comment,
+            });
+          } else {
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: comment,
+            });
+          }
+
+    - name: Set outputs
+      id: set-outputs
+      if: always()
+      shell: bash
+      run: |
+        REPORT_PATH="${{ inputs.report-path }}"
+        echo "report-path=$REPORT_PATH" >> "$GITHUB_OUTPUT"
+
+        if [ -f "$REPORT_PATH" ]; then
+          echo "risk-score=$(jq -r '.risk.score' "$REPORT_PATH")" >> "$GITHUB_OUTPUT"
+          echo "risk-level=$(jq -r '.risk.level' "$REPORT_PATH")" >> "$GITHUB_OUTPUT"
+        fi
+
+        if [ "${{ inputs.run-health }}" = "true" ] && [ -f health-summary.json ]; then
+          echo "health-score=$(jq -r '.score' health-summary.json)" >> "$GITHUB_OUTPUT"
+        fi

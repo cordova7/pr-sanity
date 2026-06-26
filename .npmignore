@@ -1,0 +1,16 @@
+test/
+src/
+.github/
+.cursor/
+node_modules/
+.pr-sanity/
+*.ts
+!dist/**/*.d.ts
+report.html
+tsup.config.ts
+eslint.config.js
+.prettierrc
+tsconfig.json
+CONTRIBUTING.md
+RELEASE.md
+docs/

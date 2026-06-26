@@ -1,0 +1,40 @@
+{
+  "score": 95,
+  "criticalCount": 0,
+  "warningCount": 1,
+  "tensionCount": 1,
+  "hasCritical": false,
+  "findings": [
+    {
+      "module": "Src",
+      "tensionType": "persistence-bypass",
+      "severity": "warning",
+      "title": "Repository pattern bypass in Application layer",
+      "detail": "20 of 67 Application-layer files (30%) access DbContext directly",
+      "affectedFiles": [
+        "Src/Application/Categories/Commands/DeleteCategory/DeleteCategoryCommand.cs",
+        "Src/Application/Categories/Commands/UpsertCategory/UpsertCategoryCommand.cs",
+        "Src/Application/Categories/Queries/GetCategoriesList/GetCategoriesListQueryHandler.cs",
+        "Src/Application/Common/Interfaces/INorthwindDbContext.cs",
+        "Src/Application/Customers/Commands/CreateCustomer/CreateCustomerCommand.cs",
+        "Src/Application/Customers/Commands/DeleteCustomer/DeleteCustomerCommandHandler.cs",
+        "Src/Application/Customers/Commands/UpdateCustomer/UpdateCustomerCommand.cs",
+        "Src/Application/Customers/Queries/GetCustomerDetail/GetCustomerDetailQueryHandler.cs"
+      ]
+    }
+  ],
+  "moduleSummaries": [
+    {
+      "module": "Src",
+      "tensionCount": 1,
+      "criticalCount": 0,
+      "tensions": [
+        {
+          "type": "persistence-bypass",
+          "severity": "warning",
+          "title": "Repository pattern bypass in Application layer"
+        }
+      ]
+    }
+  ]
+}

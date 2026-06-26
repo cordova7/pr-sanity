@@ -1,0 +1,46 @@
+{
+  "score": 95,
+  "criticalCount": 0,
+  "warningCount": 1,
+  "tensionCount": 1,
+  "hasCritical": false,
+  "findings": [
+    {
+      "module": "Controllers, Pages",
+      "tensionType": "validation-strategy-inconsistency",
+      "severity": "warning",
+      "title": "Validation strategy inconsistency",
+      "detail": "DataAnnotations: 15 (88%, dominant), manual: 2 (12%)",
+      "affectedFiles": [
+        "src/Web/Controllers/ManageController.cs",
+        "src/Web/Pages/Basket/Index.cshtml.cs"
+      ]
+    }
+  ],
+  "moduleSummaries": [
+    {
+      "module": "Controllers",
+      "tensionCount": 1,
+      "criticalCount": 0,
+      "tensions": [
+        {
+          "type": "validation-strategy-inconsistency",
+          "severity": "warning",
+          "title": "Validation strategy inconsistency"
+        }
+      ]
+    },
+    {
+      "module": "Pages",
+      "tensionCount": 1,
+      "criticalCount": 0,
+      "tensions": [
+        {
+          "type": "validation-strategy-inconsistency",
+          "severity": "warning",
+          "title": "Validation strategy inconsistency"
+        }
+      ]
+    }
+  ]
+}

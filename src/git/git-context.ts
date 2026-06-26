@@ -1,29 +1,22 @@
-import { execFile } from 'node:child_process';
-import { promisify } from 'node:util';
 import type { GitContext, GitContextOptions } from '../models/git-context.js';
-
-const execFileAsync = promisify(execFile);
-
-async function runGit(args: string[], cwd?: string): Promise<string> {
-  const { stdout } = await execFileAsync('git', args, { cwd, maxBuffer: 10 * 1024 * 1024 });
-  return stdout.trim();
-}
+import { createGitService } from './simple-git.service.js';
 
 export async function buildGitContext(options: GitContextOptions): Promise<GitContext> {
-  const { baseRef, headRef, cwd } = options;
+  const git = createGitService(options.cwd);
+  await git.assertRepository();
 
-  const mergeBase = await runGit(['merge-base', baseRef, headRef], cwd);
-  const diff = await runGit(['diff', `${mergeBase}..${headRef}`], cwd);
-  const nameOnly = await runGit(['diff', '--name-only', `${mergeBase}..${headRef}`], cwd);
-
-  const changedFiles = nameOnly
-    .split('\n')
-    .map((line) => line.trim())
-    .filter((line) => line.length > 0);
+  const changedFiles = await git.getChangedFiles({
+    baseRef: options.baseRef,
+    headRef: options.headRef,
+  });
+  const diff = await git.getDiff({
+    baseRef: options.baseRef,
+    headRef: options.headRef,
+  });
 
   return {
-    baseRef,
-    headRef,
+    baseRef: options.baseRef,
+    headRef: options.headRef,
     changedFiles,
     diff,
   };
